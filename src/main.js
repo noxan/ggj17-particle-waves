@@ -11,6 +11,9 @@ class DefaultState extends Phaser.State {
   create() {
     game.physics.startSystem(Phaser.Physics.ARCADE)
 
+    this.clickRate = 500
+    this.nextClick = 0
+
     const leftEmitter = game.add.emitter(50, game.world.centerY, 250)
     // leftEmitter.bounce.setTo(0.5, 0.5)
     leftEmitter.lifespan = 20
@@ -26,7 +29,22 @@ class DefaultState extends Phaser.State {
     this.leftEmitter = leftEmitter;
   }
 
+  placeObject() {
+    if (game.time.now < this.nextClick) {
+      return
+    }
+
+    this.nextClick = game.time.now + this.clickRate
+
+    const pos = game.input.mousePointer
+    console.log(pos.x, pos.y)
+  }
+
   update() {
+    if (game.input.activePointer.isDown) {
+      this.placeObject()
+    }
+
     this.leftEmitter.forEachAlive(particle => {
       // particle.checkWorldBounds = true
       particle.outOfBoundsKill = true
