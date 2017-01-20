@@ -5,7 +5,7 @@ class DefaultState extends Phaser.State {
   }
 
   preload() {
-    game.load.spritesheet('balls', require('./assets/balls.png'), 17, 17)
+    game.load.image('particle', require('./assets/4x4.png'))
   }
 
   create() {
@@ -14,13 +14,14 @@ class DefaultState extends Phaser.State {
     const leftEmitter = game.add.emitter(50, game.world.centerY, 250)
     // leftEmitter.bounce.setTo(0.5, 0.5)
     leftEmitter.lifespan = 20
-    leftEmitter.setXSpeed(200, 200)
-    leftEmitter.setYSpeed(0, 0)
-    leftEmitter.gravity = 0;
-    leftEmitter.makeParticles('balls', 0, 250, true, false)
+    leftEmitter.setXSpeed(150, 200)
+    leftEmitter.setYSpeed(-2, 2)
+    leftEmitter.gravity = 0
+    leftEmitter.height = 3
+    leftEmitter.makeParticles('particle', 0, 250, true, false)
 
     //leftEmitter.start(false, 0, 200)
-    leftEmitter.flow(10000, 200, 1, -1, true)
+    leftEmitter.flow(10000, 100, 2, -1, true)
 
     this.leftEmitter = leftEmitter;
   }
@@ -30,7 +31,7 @@ class DefaultState extends Phaser.State {
       // particle.checkWorldBounds = true
       particle.outOfBoundsKill = true
       const distance = game.physics.arcade.distanceToPointer(particle)
-      game.physics.arcade.moveToPointer(particle, distance)
+      // game.physics.arcade.moveToPointer(particle, distance)
     })
   }
 }
