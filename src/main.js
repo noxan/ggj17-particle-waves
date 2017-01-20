@@ -37,6 +37,9 @@ class DefaultState extends Phaser.State {
     this.nextClick = game.time.now + this.clickRate
 
     const pos = game.input.mousePointer
+
+    const base = game.add.sprite(pos.x, pos.y, 'texture-missing')
+    base.anchor.set(0.5)
     console.log(pos.x, pos.y)
   }
 
