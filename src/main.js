@@ -58,12 +58,18 @@ class DefaultState extends Phaser.State {
       particle.checkWorldBounds = true
       particle.outOfBoundsKill = true
 
-      // relativeDistance: game.physics.arcade.distanceBetween(particle, base),
       // angle: game.physics.arcade.angleBetween(particle, base),
-      const vector = this.bases.reduce((obj, base) => ({
-        x: obj.x + base.x - particle.x,
-        y: obj.y + base.y - particle.y,
-      }), { x: 0, y: 0 })
+      const vector = this.bases.reduce((obj, base) => {
+        const distance = game.physics.arcade.distanceBetween(particle, base)
+        const dx = base.x - particle.x
+        const dy = base.y - particle.y
+        const ds = (640 - distance) / 640
+
+        return {
+          x: (obj.x + dx) / 2,
+          y: (obj.y + dy) / 2,
+        }
+      }, { x: 0, y: 0 })
 
       if (particle.x !== 0 && particle.y !== 0) {
         game.debug.geom(new Phaser.Line(
