@@ -33,6 +33,62 @@ class DefaultState extends Phaser.State {
     this.leftEmitter = leftEmitter;
   }
 
+  updateParticles(particle) {
+    particle.checkWorldBounds = true
+    particle.outOfBoundsKill = true
+
+    // angle: game.physics.arcade.angleBetween(particle, base),
+    const vector = this.bases.reduce((obj, base, index) => {
+      const s = game.physics.arcade.distanceBetween(particle, base)
+
+      const ds = this.baseInfluenceRadius - s
+      if (ds < 0) {
+        return obj
+      }
+
+      const dx = base.x - particle.x
+      const dy = base.y - particle.y
+
+      const nx = dx / s
+      const ny = dy / s
+
+      /*
+      if (particle.x !== 0 && particle.y !== 0) {
+        game.debug.geom(new Phaser.Line(
+          particle.x,
+          particle.y,
+          particle.x + nx * ds,
+          particle.y + ny * ds
+        ), `#ff${index === 0 ? '00' : 'ff'}${index === 0 ? 'ff' : '00'}`)
+      }
+      */
+
+      return {
+        x: (obj.x + nx * ds) / 2,
+        y: (obj.y + ny * ds) / 2,
+      }
+    }, { x: 0, y: 0 })
+
+    particle.body.acceleration = new Phaser.Point(vector.x, vector.y)
+
+    /*
+    if (particle.x !== 0 && particle.y !== 0) {
+      game.debug.geom(new Phaser.Line(
+        particle.x,
+        particle.y,
+        particle.x + vector.x,
+        particle.y + vector.y
+      ), '#ff0000')
+    }
+    */
+
+    // game.physics.arcade.accelerateToObject(particle, base, distance)
+
+    // const distance = game.physics.arcade.distanceToPointer(particle)
+    // game.physics.arcade.moveToPointer(particle, distance)
+  }
+
+
   placeObject() {
     if (game.time.now < this.nextClick) {
       return
@@ -62,60 +118,7 @@ class DefaultState extends Phaser.State {
     ))
     */
 
-    this.leftEmitter.forEachAlive(particle => {
-      particle.checkWorldBounds = true
-      particle.outOfBoundsKill = true
-
-      // angle: game.physics.arcade.angleBetween(particle, base),
-      const vector = this.bases.reduce((obj, base, index) => {
-        const s = game.physics.arcade.distanceBetween(particle, base)
-
-        const ds = this.baseInfluenceRadius - s
-        if (ds < 0) {
-          return obj
-        }
-
-        const dx = base.x - particle.x
-        const dy = base.y - particle.y
-
-        const nx = dx / s
-        const ny = dy / s
-
-        /*
-        if (particle.x !== 0 && particle.y !== 0) {
-          game.debug.geom(new Phaser.Line(
-            particle.x,
-            particle.y,
-            particle.x + nx * ds,
-            particle.y + ny * ds
-          ), `#ff${index === 0 ? '00' : 'ff'}${index === 0 ? 'ff' : '00'}`)
-        }
-        */
-
-        return {
-          x: (obj.x + nx * ds) / 2,
-          y: (obj.y + ny * ds) / 2,
-        }
-      }, { x: 0, y: 0 })
-
-      particle.body.acceleration = new Phaser.Point(vector.x, vector.y)
-
-      /*
-      if (particle.x !== 0 && particle.y !== 0) {
-        game.debug.geom(new Phaser.Line(
-          particle.x,
-          particle.y,
-          particle.x + vector.x,
-          particle.y + vector.y
-        ), '#ff0000')
-      }
-      */
-
-      // game.physics.arcade.accelerateToObject(particle, base, distance)
-
-      // const distance = game.physics.arcade.distanceToPointer(particle)
-      // game.physics.arcade.moveToPointer(particle, distance)
-    })
+    this.leftEmitter.forEachAlive(particle => this.updateParticles(particle))
   }
 }
 
