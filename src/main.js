@@ -1,7 +1,11 @@
 import Phaser from 'phaser'
+import io from 'socket.io-client'
 
 class DefaultState extends Phaser.State {
   init() {
+    console.log('init')
+    this.socket = io('http://127.0.0.1:8000/')
+    this.socket.emit('init', { message: 'welcome' })
   }
 
   preload() {
@@ -17,8 +21,8 @@ class DefaultState extends Phaser.State {
     this.clickRate = 500
     this.nextClick = 0
     this.playerConfig = [
-      { x: 50, y: game.world.centerY, speedFactor: 1, tint: 0xffffff },
-      { x: game.world.width - 50, y: game.world.centerY, speedFactor: -1, tint: 0xff00ff },
+      { x: 50, y: game.world.centerY, speedFactor: 1, tint: 0x0000ff },
+      { x: game.world.width - 50, y: game.world.centerY, speedFactor: -1, tint: 0xff0000 },
     ]
 
     this.players = []
@@ -42,7 +46,7 @@ class DefaultState extends Phaser.State {
     leftEmitter.makeParticles('particle', 0, this.maxParticles, true, false)
 
     //leftEmitter.start(false, 0, 200)
-    leftEmitter.flow(10000, 100, 2, -1, true)
+    leftEmitter.flow(10000, 10, 2, -1, true)
 
     return leftEmitter
   }
@@ -131,7 +135,7 @@ class DefaultState extends Phaser.State {
     game.debug.text(`Bases: ${this.bases.length}`, 50, 50)
 
     this.bases.forEach(base =>
-      game.debug.geom(new Phaser.Circle(base.x, base.y, this.baseInfluenceRadius * 2), 'rgba(255,255,255,0.1')
+      game.debug.geom(new Phaser.Circle(base.x, base.y, this.baseInfluenceRadius * 2), 'rgba(255,255,255,0.05')
     )
 
     this.players.forEach((player, index) =>
@@ -144,6 +148,14 @@ class DefaultState extends Phaser.State {
         game.physics.arcade.collide(player, player2, this.onParticlesCollide, null, this)
       }
     })
+
+    const data = this.players.map(player =>
+      player.children.map(child => ({
+        x: child.x,
+        y: child.y,
+      }))
+    )
+    this.socket.emit('update', JSON.stringify(data))
   }
 
   onParticlesCollide(player, player2) {
