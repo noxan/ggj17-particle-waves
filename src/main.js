@@ -17,8 +17,8 @@ class DefaultState extends Phaser.State {
     this.clickRate = 500
     this.nextClick = 0
     this.playerConfig = [
-      { x: 50, y: game.world.centerY, speedFactor: 1 },
-      { x: game.world.width - 50, y: game.world.centerY, speedFactor: -1 },
+      { x: 50, y: game.world.centerY, speedFactor: 1, tint: 0xffffff },
+      { x: game.world.width - 50, y: game.world.centerY, speedFactor: -1, tint: 0xff00ff },
     ]
 
     this.players = []
@@ -47,9 +47,13 @@ class DefaultState extends Phaser.State {
     return leftEmitter
   }
 
-  updateParticles(particle) {
+  updateParticles(playerIndex, particle) {
     particle.checkWorldBounds = true
     particle.outOfBoundsKill = true
+
+    const currentPlayer = this.playerConfig[playerIndex]
+
+    particle.tint = currentPlayer.tint
 
     // angle: game.physics.arcade.angleBetween(particle, base),
     const vector = this.bases.reduce((obj, base, index) => {
@@ -83,7 +87,7 @@ class DefaultState extends Phaser.State {
       }
     }, { x: 0, y: 0 })
 
-    particle.body.acceleration = new Phaser.Point(vector.x, vector.y)
+    particle.body.acceleration = new Phaser.Point(-2 * vector.x, -2 * vector.y)
 
     /*
     if (particle.x !== 0 && particle.y !== 0) {
@@ -126,15 +130,25 @@ class DefaultState extends Phaser.State {
 
     game.debug.text(`Bases: ${this.bases.length}`, 50, 50)
 
-    /*
     this.bases.forEach(base =>
-      game.debug.geom(new Phaser.Circle(base.x, base.y, this.baseInfluenceRadius * 2)
-    ))
-    */
-
-    this.players.forEach(player =>
-      player.forEachAlive(particle => this.updateParticles(particle))
+      game.debug.geom(new Phaser.Circle(base.x, base.y, this.baseInfluenceRadius * 2), 'rgba(255,255,255,0.1')
     )
+
+    this.players.forEach((player, index) =>
+      player.forEachAlive(particle => this.updateParticles(index, particle))
+    )
+
+    this.players.forEach((player, index) => {
+      for (let index2 = index + 1; index2 < this.players.length; index2++) {
+        const player2 = this.players[index2]
+        game.physics.arcade.collide(player, player2, this.onParticlesCollide, null, this)
+      }
+    })
+  }
+
+  onParticlesCollide(player, player2) {
+    player.kill()
+    player2.kill()
   }
 }
 
