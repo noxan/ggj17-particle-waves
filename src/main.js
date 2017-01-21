@@ -52,10 +52,31 @@ class DefaultState extends Phaser.State {
       this.placeObject()
     }
 
+    game.debug.text(`Bases: ${this.bases.length}`, 50, 50)
+
     this.leftEmitter.forEachAlive(particle => {
-      // particle.checkWorldBounds = true
+      particle.checkWorldBounds = true
       particle.outOfBoundsKill = true
-      const distance = game.physics.arcade.distanceToPointer(particle)
+
+      // relativeDistance: game.physics.arcade.distanceBetween(particle, base),
+      // angle: game.physics.arcade.angleBetween(particle, base),
+      const vector = this.bases.reduce((obj, base) => ({
+        x: obj.x + base.x - particle.x,
+        y: obj.y + base.y - particle.y,
+      }), { x: 0, y: 0 })
+
+      if (particle.x !== 0 && particle.y !== 0) {
+        game.debug.geom(new Phaser.Line(
+          particle.x,
+          particle.y,
+          particle.x + vector.x,
+          particle.y + vector.y
+        ))
+      }
+
+      // game.physics.arcade.accelerateToObject(particle, base, distance)
+
+      // const distance = game.physics.arcade.distanceToPointer(particle)
       // game.physics.arcade.moveToPointer(particle, distance)
     })
   }
