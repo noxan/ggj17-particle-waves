@@ -17,15 +17,26 @@ class DefaultState extends Phaser.State {
     this.clickRate = 500
     this.nextClick = 0
 
-    this.leftEmitter = this.createPlayer()
+    this.players = []
+    this.players.push(this.createPlayer())
+    this.players.push(this.createPlayer())
   }
 
   createPlayer() {
-    const leftEmitter = game.add.emitter(50, game.world.centerY, this.maxParticles)
+    const playerCount = this.players.length
+
+    console.log(playerCount)
+
+    const spawnPosition = [
+      { x: 50, y: game.world.centerY, speedFactor: 1 },
+      { x: game.world.width - 50, y: game.world.centerY, speedFactor: -1 },
+    ][playerCount]
+
+    const leftEmitter = game.add.emitter(spawnPosition.x, spawnPosition.y, this.maxParticles)
     // leftEmitter.bounce.setTo(0.5, 0.5)
     leftEmitter.lifespan = 20
     leftEmitter.particleAnchor = new Phaser.Point(0.5, 0.5)
-    leftEmitter.setXSpeed(150, 200)
+    leftEmitter.setXSpeed(150 * spawnPosition.speedFactor, 200 * spawnPosition.speedFactor)
     leftEmitter.setYSpeed(-2, 2)
     leftEmitter.gravity = 0
     leftEmitter.height = 3
@@ -122,7 +133,9 @@ class DefaultState extends Phaser.State {
     ))
     */
 
-    this.leftEmitter.forEachAlive(particle => this.updateParticles(particle))
+    this.players.forEach(player =>
+      player.forEachAlive(particle => this.updateParticles(particle))
+    )
   }
 }
 
