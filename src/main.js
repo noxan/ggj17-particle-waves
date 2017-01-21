@@ -11,6 +11,7 @@ class DefaultState extends Phaser.State {
   create() {
     game.physics.startSystem(Phaser.Physics.ARCADE)
 
+    this.bases = []
     this.clickRate = 500
     this.nextClick = 0
 
@@ -41,6 +42,8 @@ class DefaultState extends Phaser.State {
     const base = game.add.sprite(pos.x, pos.y, 'texture-missing')
     base.anchor.set(0.5)
     console.log(pos.x, pos.y)
+
+    this.bases.push(base)
   }
 
   update() {
