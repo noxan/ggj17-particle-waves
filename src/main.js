@@ -18,6 +18,7 @@ class DefaultState extends Phaser.State {
     const leftEmitter = game.add.emitter(50, game.world.centerY, 250)
     // leftEmitter.bounce.setTo(0.5, 0.5)
     leftEmitter.lifespan = 20
+    leftEmitter.particleAnchor = new Phaser.Point(0.5, 0.5)
     leftEmitter.setXSpeed(150, 200)
     leftEmitter.setYSpeed(-2, 2)
     leftEmitter.gravity = 0
