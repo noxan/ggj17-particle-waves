@@ -17,6 +17,10 @@ class DefaultState extends Phaser.State {
     this.clickRate = 500
     this.nextClick = 0
 
+    this.leftEmitter = this.createPlayer()
+  }
+
+  createPlayer() {
     const leftEmitter = game.add.emitter(50, game.world.centerY, this.maxParticles)
     // leftEmitter.bounce.setTo(0.5, 0.5)
     leftEmitter.lifespan = 20
@@ -30,7 +34,7 @@ class DefaultState extends Phaser.State {
     //leftEmitter.start(false, 0, 200)
     leftEmitter.flow(10000, 100, 2, -1, true)
 
-    this.leftEmitter = leftEmitter;
+    return leftEmitter
   }
 
   updateParticles(particle) {
