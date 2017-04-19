@@ -154,7 +154,7 @@ class DefaultState extends Phaser.State {
 
 class Game extends Phaser.Game {
   constructor() {
-    super(640, 480, Phaser.AUTO)
+    super(1024, 480, Phaser.AUTO)
 
     this.state.add('Default', DefaultState, false)
 
